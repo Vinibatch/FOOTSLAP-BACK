@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var slapSchema = mongoose.Schema({
   state: String,
   date: Date,
-  competition: String,
+  competition: { type: mongoose.Schema.Types.ObjectId, ref: 'competitions' },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
   staff: { type: mongoose.Schema.Types.ObjectId, ref: 'staff' },
 });

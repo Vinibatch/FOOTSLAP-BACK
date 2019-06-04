@@ -12,3 +12,4 @@ var userSchema = mongoose.Schema({
 
 // export model and link scheme with collection
 module.exports = mongoose.model('users', userSchema);
+ 

@@ -4,8 +4,9 @@ var mongoose = require('mongoose');
 var staffSchema = mongoose.Schema({
   firstName: String,
   lastName: String,
-  avatar: Buffer,
+  avatar: String,
   poste: String,
+  live: Boolean,
   slapGlobal: Number,
   clapGlobal: Number,
   slapLive: Number,

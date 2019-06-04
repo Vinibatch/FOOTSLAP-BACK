@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 // create a scheme
 var teamSchema = mongoose.Schema({
   name: String,
-  logo: Buffer,
+  logo: String,
   live: Boolean,
 });
 
