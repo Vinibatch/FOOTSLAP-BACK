@@ -13,21 +13,37 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.post('/Login', function (req, res, next) {
+router.get('/redux', function (req, res, next) {
+
+  // Recup les équipes du player avec son staff et les compteurs associés aux staff et au user
+  userModel.findById('5cf65957c04dbd0a6ebb10c8')
+    .populate('teams')
+    .exec(function (err, user) {
+      console.log('user----->', user);
+      // res.json({result: true, user})
+    })
+    // staffTeamModel.find('5cf638f9fd560d0471d11776')
+    //   .populate('staff')
+    //   .exec(function(err, staff) {
+    //     console.log('staff----->', staff);
+    //     res.json({result: true, staff})
+    //   })
+});
+
+router.get('login', function (req, res, next) {
 
   // Connect Fb et Google ou envoie vers signIn
   
-  res.json({result: true})
 });
 
-router.post('/SignIn', function (req, res, next) {
+router.post('/sign-in', function (req, res, next) {
 
   // Compare username et password avec la base
 
   res.json({result: true})
 });
 
-router.post('/SignUp', function (req, res, next) {
+router.post('/sign-up', function (req, res, next) {
 
   // Save nouveau user
   var user = new userModel ({
@@ -109,6 +125,21 @@ router.post('/team', function (req, res, next) {
   });
 });
 
+router.post('/team-compet', function (req, res, next) {
+
+  // add and update staff
+  var teamCompet = new teamCompetModel ({
+    competitions: req.body.competition_id,
+    teams: req.body.team_id,
+  });
+
+  teamCompet.save(
+    function(error, teamCompet) {
+      console.log('saved---->', teamCompet);
+      res.json({result: true, teamCompet});
+  });
+});
+
 router.post('/staff', function (req, res, next) {
 
   // add and update staff
@@ -132,11 +163,34 @@ router.post('/staff', function (req, res, next) {
   });
 });
 
-router.post('/Competition', function (req, res, next) {
+router.post('/staff-team', function (req, res, next) {
+
+  // add and update staff
+  var staffTeam = new staffTeamModel ({
+    staff: req.body.staff_id,
+    teams: req.body.team_id,
+  });
+
+  staffTeam.save(
+    function(error, staffTeam) {
+      console.log('saved---->', staffTeam);
+      res.json({result: true, staffTeam});
+  });
+});
+
+router.post('/competition', function (req, res, next) {
 
   // add and update compet
+  var competition = new competitionModel ({
+    name: req.body.name,
+    country: req.body.country,
+  });
 
-  res.json({result: true})
+  competition.save(
+    function(error, competition) {
+      console.log('saved---->', competition);
+      res.json({result: true, competition});
+  });
 });
 
 module.exports = router;
