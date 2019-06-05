@@ -13,6 +13,36 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.post('/live-counter', function (req, res, next) {
+
+  var action = req.body.action == 'slap' ? {$inc: {slapLive: +1}} : {$inc: {clapLive: +1}}
+
+  staffModel.updateOne(
+    {_id: req.body.playerId},
+    action,
+    function (err, staff) {
+       
+      console.log('staff----->', staff);
+      
+      res.json({result: true, staff})
+    });
+});
+
+router.post('/global-counter', function (req, res, next) {
+
+  var action = req.body.action == 'slap' ? {$inc: {slapLive: +1}} : {$inc: {clapLive: +1}}
+
+  staffModel.updateOne(
+    {_id: req.body.playerId},
+    {$inc: {slapGlobal: +1, clapGlobal: +1}},
+    function (err, staff) {
+       
+      console.log('staff----->', staff);
+      
+      res.json({result: true, staff})
+    });
+});
+
   // Recup les équipes du player avec son staff et les compteurs associés aux staff et au user
 router.get('/redux', function (req, res, next) {
 
@@ -23,7 +53,7 @@ router.get('/redux', function (req, res, next) {
 
       user.teams.map((teams, i) =>{
 
-        console.log('teams', teams._id)
+        // console.log('teams', teams._id)
 
         staffTeamModel.findOne({teams: teams._id})
           .populate('staff')
@@ -109,25 +139,6 @@ router.get('/account', function (req, res, next) {
     res.json({result: true})
 
   })
-
-  // competitionModel.find(
-  //   function (error, compet) {
-  //     console.log(compet)
-  //     res.json({result: true})
-
-  //     compet.map((compets, i) =>{
-  //       console.log(compets._id)
-
-  //     })
-
-  //   })
-
-  //   // .populate('competitions')
-  //   // .populate('teams')
-  //   // .exec(function (err, compets) {
-  //   //   console.log('compets----->', compets);
-  //   //   res.json({result: true})
-  //   // });
 });
 
 
@@ -158,7 +169,7 @@ router.post('/slap-card', function (req, res, next) {
   res.json({result: true})
 });
 
-  // add and update team
+  // add team
 router.post('/team', function (req, res, next) {
 
   var team = new teamModel ({
@@ -175,7 +186,7 @@ router.post('/team', function (req, res, next) {
   });
 });
 
-  // add and update staff
+  // adssociate team to a competition
 router.post('/team-compet', function (req, res, next) {
 
   var teamCompet = new teamCompetModel ({
@@ -190,7 +201,7 @@ router.post('/team-compet', function (req, res, next) {
   });
 });
 
-  // add and update staff
+  // add staff
 router.post('/staff', function (req, res, next) {
 
   var staff = new staffModel ({
@@ -213,7 +224,7 @@ router.post('/staff', function (req, res, next) {
   });
 });
 
-  // add and update staff
+  // associate staff to a team
 router.post('/staff-team', function (req, res, next) {
 
   var staffTeam = new staffTeamModel ({
@@ -228,7 +239,7 @@ router.post('/staff-team', function (req, res, next) {
   });
 });
 
-  // add and update compet
+  // add competition
 router.post('/competition', function (req, res, next) {
 
   var competition = new competitionModel ({
