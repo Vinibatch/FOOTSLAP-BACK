@@ -8,44 +8,43 @@ var teamModel = require('../models/team');
 var teamCompetModel = require('../models/teamCompet');
 var userModel = require('../models/user');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-router.get('/redux', function (req, res, next) {
+// /* GET home page. */
+// router.get('/', function(req, res, next) {
+//   res.render('index', { title: 'Express' });
+// });
 
   // Recup les équipes du player avec son staff et les compteurs associés aux staff et au user
+router.get('/redux', function (req, res, next) {
+
   userModel.findById('5cf65957c04dbd0a6ebb10c8')
     .populate('teams')
     .exec(function (err, user) {
       console.log('user----->', user);
       // res.json({result: true, user})
     })
+
     // staffTeamModel.find('5cf638f9fd560d0471d11776')
-    //   .populate('staff')
     //   .exec(function(err, staff) {
     //     console.log('staff----->', staff);
     //     res.json({result: true, staff})
     //   })
 });
 
-router.get('login', function (req, res, next) {
+
 
   // Connect Fb et Google ou envoie vers signIn
-  
-});
-
-router.post('/sign-in', function (req, res, next) {
-
-  // Compare username et password avec la base
-
+router.get('login', function (req, res, next) {
   res.json({result: true})
 });
 
+  // Compare username et password avec la base
+router.post('/sign-in', function (req, res, next) {
+  res.json({result: true})
+});
+
+  // Save new user
 router.post('/sign-up', function (req, res, next) {
 
-  // Save nouveau user
   var user = new userModel ({
     username: req.body.username,
     email: req.body.email,
@@ -62,24 +61,32 @@ router.post('/sign-up', function (req, res, next) {
   });
 });
 
-router.post('/Account', function (req, res, next) {
+  // Update user (ajout de l'équipe)
+router.post('/account', function (req, res, next) {
 
-  // Update user (ajout l'équipe)
+  userModel.findById('5cf65957c04dbd0a6ebb10c8',
+    function (err, user) {
+      console.log('user----->', user);
 
-  res.json({result: true})
+      user.teams.push(req.body.teams_id);
+
+      user.save(
+        function (error, user) {
+          console.log('saved---->', user.teams);
+          res.json({result: true})
+        });
+    });
 });
-
-router.get('/Account', function (req, res, next) {
 
   // Recup le compteur slap/clap du user et avatar player most slapped
-
+router.get('/account', function (req, res, next) {
   res.json({result: true})
 });
 
+
+
+// Slap global et live par équipe et compétition
 router.get('/actuSlap', function (req, res, next) {
-
-  // Slap global et live par équipe et compétition
-
   res.json({result: true})
 });
 
@@ -87,30 +94,26 @@ router.get('/actuSlap', function (req, res, next) {
 //   res.json({result: true})
 // });
 
-router.post('/VsEvent', function (req, res, next) {
-
-  // Save or update slap count 
-
+  // Save or update slap count
+router.post('/vs-event', function (req, res, next) {
   res.json({result: true})
 });
 
-router.post('/VsVote', function (req, res, next) {
+router.post('/vs-vote', function (req, res, next) {
 
   // ???
 
   res.json({result: true})
 });
 
-router.post('/SlapCard', function (req, res, next) {
-
   // counter global et live (update du staff)
-
+router.post('/slap-card', function (req, res, next) {
   res.json({result: true})
 });
 
+  // add and update team
 router.post('/team', function (req, res, next) {
 
-  // add and update team
   var team = new teamModel ({
     name: req.body.name,
     logo: req.body.logo,
@@ -125,9 +128,9 @@ router.post('/team', function (req, res, next) {
   });
 });
 
+  // add and update staff
 router.post('/team-compet', function (req, res, next) {
 
-  // add and update staff
   var teamCompet = new teamCompetModel ({
     competitions: req.body.competition_id,
     teams: req.body.team_id,
@@ -140,9 +143,9 @@ router.post('/team-compet', function (req, res, next) {
   });
 });
 
+  // add and update staff
 router.post('/staff', function (req, res, next) {
 
-  // add and update staff
   var staff = new staffModel ({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -163,9 +166,9 @@ router.post('/staff', function (req, res, next) {
   });
 });
 
+  // add and update staff
 router.post('/staff-team', function (req, res, next) {
 
-  // add and update staff
   var staffTeam = new staffTeamModel ({
     staff: req.body.staff_id,
     teams: req.body.team_id,
@@ -178,9 +181,9 @@ router.post('/staff-team', function (req, res, next) {
   });
 });
 
+  // add and update compet
 router.post('/competition', function (req, res, next) {
 
-  // add and update compet
   var competition = new competitionModel ({
     name: req.body.name,
     country: req.body.country,
