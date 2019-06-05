@@ -51,29 +51,21 @@ router.get('/redux', async function (req, res, next) {
   var user = await userModel.findById('5cf65957c04dbd0a6ebb10c8')
     .populate('teams')
     .exec();
-
-    
-      // console.log('user----->', user);
       
     var staffList=[];
  
-
-    console.log(user);
     for(let i=0, max = user.teams.length; i<max; i++) {
-      // console.log('teams', teams._id)
+      
       let teams = user.teams[i];
+
       var staff = await staffTeamModel.findOne({teams: teams._id})
         .populate('staff')
         .populate('teams')
         .exec();
 
         staffList.push(staff);
-        console.log(staff);
     }
-    console.log('staffList', staffList)
-
     res.json({user, staffList})
-  
 });
 
 
@@ -125,28 +117,26 @@ router.post('/account', function (req, res, next) {
 });
 
   // Recup le compteur slap/clap du user et avatar player most slapped
-router.get('/account', function (req, res, next) {
+router.get('/account', async function (req, res, next) {
 
-  competitionModel.find()
-  .populate('teams')
-  .exec(function (err, compets) {
-    // console.log('user----->', user);
+  var competitions = await competitionModel.find()
+  // .populate('teams')
+  .exec();
+    
+  var teamList=[];
 
-    compets.map((competitions, i) =>{
+  for(let i=0, max = competitions.length; i<max; i++) {
+    
+    let compets = competitions[i];
 
-      console.log('teams', competitions._id, competitions.name)
+    var teams = await teamCompetModel.find({compets: competitions._id})
+      .populate('competitions')
+      .populate('teams')
+      .exec();
 
-      teamCompetModel.find({competitions: competitions._id})
-        .populate('competitions')
-        .populate('teams')
-        .exec(function (err, teams) {
-          console.log('teamCompetModel----->', teams);
-        });
-    })
-
-    res.json({result: true})
-
-  })
+      teamList.push(teams);
+  }
+  res.json({competitions, teamList})
 });
 
 
