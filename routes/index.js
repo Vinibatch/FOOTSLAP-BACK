@@ -13,6 +13,23 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.post('/slap-counter', function(req, res, next) {
+
+  var slap = new slapModel ({
+    state: req.body.state,
+    date: req.body.date,
+    competition: req.body.competition_id,
+    user: req.body.user_id,
+    staff: req.body.staff_id,
+  });
+
+  slap.save(
+    function(error, slap) {
+      console.log('saved---->', slap);
+      res.json({result: true, slap});
+  });
+})
+
   // Get live count from SlapCard
 router.post('/live-counter', function (req, res, next) {
 
@@ -52,20 +69,17 @@ router.get('/redux', async function (req, res, next) {
     .populate('teams')
     .exec();
       
-    var staffList=[];
- 
-    for(let i=0, max = user.teams.length; i<max; i++) {
-      
-      let teams = user.teams[i];
-
-      var staff = await staffTeamModel.findOne({teams: teams._id})
+  
+    var copyUser = JSON.parse(JSON.stringify(user));
+    for(var i=0, max = copyUser.teams.length; i<max; i++) {
+          
+      var staff = await staffTeamModel.find({teams: copyUser.teams[i]._id})
         .populate('staff')
-        .populate('teams')
         .exec();
-
-        staffList.push(staff);
+         
+        copyUser.teams[i].staffList = staff;
     }
-    res.json({user, staffList})
+    res.json({user: copyUser})
 });
 
 
@@ -120,23 +134,40 @@ router.post('/account', function (req, res, next) {
 router.get('/account', async function (req, res, next) {
 
   var competitions = await competitionModel.find()
-  // .populate('teams')
-  .exec();
+    // .populate('teams')
+    .exec();
+      
+    var competitionsCopy = JSON.parse(JSON.stringify(competitions));
+    for(var i=0, max = competitionsCopy.length; i<max; i++) {
+          
+      var teams = await teamCompetModel.find({competitions: competitionsCopy[i]._id})
+        .populate('teams')
+        .exec();
+         
+        competitionsCopy[i].teamList = teams;
+
+        console.log(competitionsCopy)
+    }
+    res.json({competitions: competitionsCopy})
+
+  // var competitions = await competitionModel.find()
+  // // .populate('teams')
+  // .exec();
     
-  var teamList=[];
+  // var teamList=[];
 
-  for(let i=0, max = competitions.length; i<max; i++) {
+  // for(let i=0, max = competitions.length; i<max; i++) {
     
-    let compets = competitions[i];
+  //   let compets = competitions[i];
 
-    var teams = await teamCompetModel.find({compets: competitions._id})
-      .populate('competitions')
-      .populate('teams')
-      .exec();
+  //   var teams = await teamCompetModel.find({compets: competitions._id})
+  //     .populate('competitions')
+  //     .populate('teams')
+  //     .exec();
 
-      teamList.push(teams);
-  }
-  res.json({competitions, teamList})
+  //     teamList.push(teams);
+  // }
+  // res.json({competitions, teamList})
 });
 
 
