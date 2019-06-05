@@ -8,10 +8,10 @@ var teamModel = require('../models/team');
 var teamCompetModel = require('../models/teamCompet');
 var userModel = require('../models/user');
 
-// /* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.render('index', { title: 'Express' });
-// });
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
 
   // Recup les équipes du player avec son staff et les compteurs associés aux staff et au user
 router.get('/redux', function (req, res, next) {
@@ -19,15 +19,23 @@ router.get('/redux', function (req, res, next) {
   userModel.findById('5cf65957c04dbd0a6ebb10c8')
     .populate('teams')
     .exec(function (err, user) {
-      console.log('user----->', user);
-      // res.json({result: true, user})
-    })
+      // console.log('user----->', user);
 
-    // staffTeamModel.find('5cf638f9fd560d0471d11776')
-    //   .exec(function(err, staff) {
-    //     console.log('staff----->', staff);
-    //     res.json({result: true, staff})
-    //   })
+      user.teams.map((teams, i) =>{
+
+        console.log('teams', teams._id)
+
+        staffTeamModel.findOne({teams: teams._id})
+          .populate('staff')
+          .populate('teams')
+          .exec(function (err, staff) {
+            console.log('staffTeamModel----->', staff);
+          });
+      })
+
+      res.json({result: true})
+
+    })
 });
 
 
@@ -80,7 +88,46 @@ router.post('/account', function (req, res, next) {
 
   // Recup le compteur slap/clap du user et avatar player most slapped
 router.get('/account', function (req, res, next) {
-  res.json({result: true})
+
+  competitionModel.find()
+  .populate('teams')
+  .exec(function (err, compets) {
+    // console.log('user----->', user);
+
+    compets.map((competitions, i) =>{
+
+      console.log('teams', competitions._id, competitions.name)
+
+      teamCompetModel.find({competitions: competitions._id})
+        .populate('competitions')
+        .populate('teams')
+        .exec(function (err, teams) {
+          console.log('teamCompetModel----->', teams);
+        });
+    })
+
+    res.json({result: true})
+
+  })
+
+  // competitionModel.find(
+  //   function (error, compet) {
+  //     console.log(compet)
+  //     res.json({result: true})
+
+  //     compet.map((compets, i) =>{
+  //       console.log(compets._id)
+
+  //     })
+
+  //   })
+
+  //   // .populate('competitions')
+  //   // .populate('teams')
+  //   // .exec(function (err, compets) {
+  //   //   console.log('compets----->', compets);
+  //   //   res.json({result: true})
+  //   // });
 });
 
 
