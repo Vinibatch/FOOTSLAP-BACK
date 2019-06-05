@@ -13,6 +13,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+  // Get live count from SlapCard
 router.post('/live-counter', function (req, res, next) {
 
   var action = req.body.action == 'slap' ? {$inc: {slapLive: +1}} : {$inc: {clapLive: +1}}
@@ -28,6 +29,7 @@ router.post('/live-counter', function (req, res, next) {
     });
 });
 
+  // Get global count from SlapCard
 router.post('/global-counter', function (req, res, next) {
 
   var action = req.body.action == 'slap' ? {$inc: {slapLive: +1}} : {$inc: {clapLive: +1}}
@@ -44,28 +46,34 @@ router.post('/global-counter', function (req, res, next) {
 });
 
   // Recup les équipes du player avec son staff et les compteurs associés aux staff et au user
-router.get('/redux', function (req, res, next) {
+router.get('/redux', async function (req, res, next) {
 
-  userModel.findById('5cf65957c04dbd0a6ebb10c8')
+  var user = await userModel.findById('5cf65957c04dbd0a6ebb10c8')
     .populate('teams')
-    .exec(function (err, user) {
+    .exec();
+
+    
       // console.log('user----->', user);
+      
+    var staffList=[];
+ 
 
-      user.teams.map((teams, i) =>{
+    console.log(user);
+    for(let i=0, max = user.teams.length; i<max; i++) {
+      // console.log('teams', teams._id)
+      let teams = user.teams[i];
+      var staff = await staffTeamModel.findOne({teams: teams._id})
+        .populate('staff')
+        .populate('teams')
+        .exec();
 
-        // console.log('teams', teams._id)
+        staffList.push(staff);
+        console.log(staff);
+    }
+    console.log('staffList', staffList)
 
-        staffTeamModel.findOne({teams: teams._id})
-          .populate('staff')
-          .populate('teams')
-          .exec(function (err, staff) {
-            console.log('staffTeamModel----->', staff);
-          });
-      })
-
-      res.json({result: true})
-
-    })
+    res.json({user, staffList})
+  
 });
 
 
