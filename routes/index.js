@@ -69,7 +69,6 @@ router.get('/redux', async function (req, res, next) {
     .populate('teams')
     .exec();
       
-  
     var copyUser = JSON.parse(JSON.stringify(user));
     for(var i=0, max = copyUser.teams.length; i<max; i++) {
           
@@ -149,32 +148,36 @@ router.get('/account', async function (req, res, next) {
         console.log(competitionsCopy)
     }
     res.json({competitions: competitionsCopy})
-
-  // var competitions = await competitionModel.find()
-  // // .populate('teams')
-  // .exec();
-    
-  // var teamList=[];
-
-  // for(let i=0, max = competitions.length; i<max; i++) {
-    
-  //   let compets = competitions[i];
-
-  //   var teams = await teamCompetModel.find({compets: competitions._id})
-  //     .populate('competitions')
-  //     .populate('teams')
-  //     .exec();
-
-  //     teamList.push(teams);
-  // }
-  // res.json({competitions, teamList})
 });
 
 
 
 // Slap global et live par équipe et compétition
-router.get('/actuSlap', function (req, res, next) {
-  res.json({result: true})
+router.get('/actu-slap', async function (req, res, next) {
+
+  var competitions = await competitionModel.find()
+  .populate('teams')
+  .exec();
+    
+  var competitionsCopy = JSON.parse(JSON.stringify(competitions));
+  
+  for(var i=0, maxi = competitionsCopy.length; i<maxi; i++) {
+        
+    var teams = await teamCompetModel.find({competitions: competitionsCopy[i]._id})
+    .populate('teams')
+    .exec();
+       
+      competitionsCopy[i].teamList = JSON.parse(JSON.stringify(teams));
+      
+      for(var y=0, maxy = competitionsCopy[i].teamList.length; y<maxy; y++) {
+      var staff = await staffTeamModel.find({teams: competitionsCopy[i].teamList[y].teams._id})
+        .populate('staff')
+        .exec();
+         
+        competitionsCopy[i].teamList[y].staffList = JSON.parse(JSON.stringify(staff));
+      }  
+  }
+  res.json({competitions: competitionsCopy})
 });
 
 // router.post('/actuslapSearch', function (req, res, next) {
